@@ -1,0 +1,57 @@
+<?php
+
+
+use Drupal\xtended_entity\Controllers\XtendedNodeController;
+use Drupal\xtended_entity\Controllers\XtendedTaxonomyTermController;
+
+/**
+ * 
+ * @param unknown $infos
+ */
+function xtended_entity_entity_info_alter( &$infos ) {
+  // node
+  $infos['node']['controller class'] = XtendedNodeController::class;
+  $infos['node']['metadata controller class'] = "";
+  // taxonomy_term
+  $infos['taxonomy_term']['controller class'] = XtendedTaxonomyTermController::class;
+  $infos['taxonomy_term']['metadata controller class'] = "";
+}
+
+/**
+ * implementation of hook_module_implements_alter()
+ * ensures that the implementation of hook_entity_info_alter 
+ * for this module is the last executed.
+ * 
+ * @param array $implementations
+ * @param string $hook
+ * @see hook_module_implements_alter()
+ */
+function xtended_entity_module_implements_alter( &$implementations, $hook ) {
+  if( $hook == 'entity_info_alter' ) {
+    $tmp = $implementations['xtended_entity'];
+    unset( $implementations['xtended_entity'] );
+    $implementations['xtended_entity'] = $tmp;
+  }
+}
+
+
+
+function xtended_entity_theme_registry_alter( &$theme_registry ) {
+  
+  $original_node = node_theme();
+
+  foreach( array_keys($original_node) as $key ) {
+    unset ( $theme_registry[ $key] );
+  }
+  
+  $module = 'node';
+  _theme_process_registry($theme_registry, $module, 'module', $module, drupal_get_path('module', $module));
+
+  
+  $types = array_keys(entity_crud_get_info());
+  $key = array_search( 'node', $types);
+  if( $key !== FALSE) unset( $types[$key] );
+  $pattern = '(' . implode('|', $types) . ')(\.|__)';
+  $theme_registry['entity']['pattern'] = $pattern;
+
+}

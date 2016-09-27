@@ -1,0 +1,12 @@
+<?php
+
+
+function xtended_entity_test_enable() {
+  
+  $opts = array(
+    'revision'
+  );
+  variable_set('node_options_test_type' , $opts);
+  variable_set('language_content_type_test_type' , 4);
+  
+}

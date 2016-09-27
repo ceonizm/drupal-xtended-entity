@@ -1,0 +1,9 @@
+name = Xtended Entity
+description = a set of controllers that extends entity api and allows to use new features
+core = 7.x
+php = 5.6
+
+dependencies[] = entity
+dependencies[] = xautoload
+
+files[] = xtended_entity.test

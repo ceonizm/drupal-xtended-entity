@@ -1,0 +1,7 @@
+name = Xtended entity test module
+description = test module that
+
+core = 7.x
+
+dependencies[] = xtended_entity
+dependencies[] = entity_translation

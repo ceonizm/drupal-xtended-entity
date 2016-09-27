@@ -1,0 +1,79 @@
+<?php
+
+use Drupal\xtended_entity\Controllers\XtendedNodeController;
+use Drupal\xtended_entity_test\TestType;
+use Drupal\xtended_entity\Controllers\XtendedTaxonomyTermController;
+use Drupal\xtended_entity\Entities\TaxonomyTerm;
+use Drupal\xtended_entity_test\TestBuildingTerm;
+
+class XtendedEntityTest extends DrupalWebTestCase {
+  
+  
+  public static function getInfo() {
+    return array(
+      'name' => 'Xtended entity Controller', 
+      'description' => 'this tests ensure the controller provided features runs correctly', 
+      'group' => 'Viadirect Core'
+    );
+  }
+  
+  public function setUp() {
+//     parent::setUp('entity', 'xautoload', 'entity_translation', 'xtended_entity_test');
+    module_enable( array( 'xtended_entity_test' ) );
+    $this->public_files_directory = "public://";
+    $this->originalPrefix = $GLOBALS['db_prefix'];
+    $this->setup = TRUE;
+  }
+  
+  
+  public function tearDown() {
+    module_disable( array( 'xtended_entity_test' ) );
+  }
+  
+  public function testCreatingNode() {
+    /* @var $ctrl XtendedNodeController */
+    $ctrl = entity_get_controller("node");
+
+    $this->assertEqual( get_class( $ctrl ), XtendedNodeController::class, 'node controller should be replaced by our xtended ', 'xtended entity node' );
+    
+    $created = $ctrl->create( array( 'type' => 'test_type', 'uid'=>0, 'title' => 'plop' ) );
+    $this->assertNotNull($created, 'created node should not be null');
+
+    $this->assertEqual(get_class( $created ), TestType::class, 'created node should not be of the bundle class TestType' );
+     
+    $res = node_save( $created );
+    $this->assertNotNull( $created->getId(), 'node should have a nid '.$created->getId() );
+    $this->_node_id = $created->getId();
+
+  }
+  
+  public function testLoadingNode() {
+    /* @var $ctrl XtendedNodeController */
+    $ctrl = entity_get_controller("node");
+    $loaded = node_load( $this->_node_id );
+    $this->assertEqual( get_class( $loaded ), TestType::class, 'loaded node should not be of the bundle class TestType' );
+    
+  }
+  
+  
+  
+  public function testTaxonomyTerm() {
+    
+    /* @var $ctrl XtendedTaxonomyTermController */
+    $ctrl = entity_get_controller( "taxonomy_term" );
+    $this->assertEqual( get_class( $ctrl ), XtendedTaxonomyTermController::class, 'taxonomy_term controller should be replaced by our xtended ', 'xtended entity taxonomy_term' );
+    $ctrl->setBundle( 'buildings' );
+    $term = $ctrl->retrieveEntityByProperty( 'name', 'DECATHLON' ); 
+    $this->assertEqual( get_class( $term ), TestBuildingTerm::class, 'term should be an instance of TermBuildingTerm', 'xtended entity taxonomy_term' );
+    
+    /* @var $term TaxonomyTerm */
+    $term = $ctrl->retrieveTermByName( 'DECATHLON' ); 
+    $this->assertEqual( get_class( $term ), TestBuildingTerm::class, 'term should be an instance of TermBuildingTerm', 'xtended entity taxonomy_term' );  
+    $this->assertEqual( $term->name , 'DECATHLON', 'term name should be DECATHLON', 'xtended entity taxonomy_term' );  
+  
+    $ctrl->setBundle( 'tags' );
+    $term = $ctrl->retrieveTermByName( 'DECATHLON' );
+    $this->assertFalse( $term, 'there should not be any result with wrong vocabulary', 'xtended entity taxonomy_term' );
+    
+  }
+}
