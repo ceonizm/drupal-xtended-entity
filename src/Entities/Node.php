@@ -40,5 +40,5 @@ class Node extends \Entity {
     return $this->nid;
   }
   
-  
+//   public function attachLoad()
 }

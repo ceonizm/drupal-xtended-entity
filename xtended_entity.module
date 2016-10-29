@@ -10,13 +10,35 @@ use Drupal\xtended_entity\Controllers\XtendedTaxonomyTermController;
  */
 function xtended_entity_entity_info_alter( &$infos ) {
   // node
-  $infos['node']['controller class'] = XtendedNodeController::class;
+  $ctrlClass = xtended_entity_request_controller_class( "node", XtendedNodeController::class );
+  $infos['node']['controller class'] = $ctrlClass;
   $infos['node']['metadata controller class'] = "";
+  
   // taxonomy_term
-  $infos['taxonomy_term']['controller class'] = XtendedTaxonomyTermController::class;
+  // let opportunity to other module to define their own controller 
+  $ctrlClass = xtended_entity_request_controller_class( "taxonomy_term", XtendedTaxonomyTermController::class );
+  $infos['taxonomy_term']['controller class'] = $ctrlClass;
   $infos['taxonomy_term']['metadata controller class'] = "";
 }
 
+/**
+ * 
+ * @param string $entity_type
+ * @param string $defaultCtrl
+ * @return string
+ */
+function xtended_entity_request_controller_class( $entity_type, $defaultCtrl ) {
+  $message = array('entity_type'=>$entity_type, 'ctrl'=>$defaultCtrl);
+  foreach( module_implements( "xtended_entity_choose_controller") as $module ) {
+    $func = "{$module}_xtended_entity_choose_controller";
+    $func( $message );
+  }
+  if( $message['ctrl'] != $defaultCtrl ) {
+    if( class_exists($message['ctrl'] ) && is_subclass_of($message['ctrl'], $defaultCtrl) ) 
+      return $message['ctrl'];
+  } 
+  return $defaultCtrl;
+}
 /**
  * implementation of hook_module_implements_alter()
  * ensures that the implementation of hook_entity_info_alter 

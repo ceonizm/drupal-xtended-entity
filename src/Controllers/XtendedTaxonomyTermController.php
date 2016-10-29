@@ -7,7 +7,7 @@ class XtendedTaxonomyTermController extends XtendedEntityController {
   
   public function __construct( $pBundle = NULL) {
     parent::__construct("taxonomy_term", $pBundle );
-
+    watchdog( "xtended_entity", "XtendedTaxonomyTermController::__construct ". var_export( $this->entityInfo['bundles'], 1) );
   }
   
   public function retrieveTermByName( $name ) {

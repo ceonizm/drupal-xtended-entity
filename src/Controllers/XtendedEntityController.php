@@ -2,7 +2,7 @@
 
 namespace Drupal\xtended_entity\Controllers;
 
-class XtendedEntityController extends \EntityAPIController {
+class XtendedEntityController extends \EntityAPIControllerExportable {
   
   protected $bundle;
   
@@ -38,6 +38,29 @@ class XtendedEntityController extends \EntityAPIController {
     return $efq;
   }
 
+  /**
+   * 
+   * @return unknown
+   */
+  public function count() {
+    $q = $this->buildEntityFieldQuery()->count();
+  
+    return $q->execute();
+  }
+  
+  /**
+   * 
+   * @param unknown $start
+   * @param unknown $amount
+   * @return mixed[]|Array|The
+   */
+  public function loadRange($start, $amount) {
+    $res = $this->buildEntityFieldQuery()->range($start, $amount)->execute();
+    if ($res && !empty($res[$this->entityType])) {
+      return $this->load(array_keys($res[$this->entityType]));
+    }
+  }
+  
   /**
    *
    * @param string $pPropertyName        
@@ -147,6 +170,7 @@ class XtendedEntityController extends \EntityAPIController {
     if (!empty($bundleKey)) {
       watchdog("xtended_entity", "bundleKey to lookup is ".$bundleKey );
       $class = $this->getBundleClass($bundleKey);
+      watchdog("xtended_entity", "class found is ".$class );
     }
     if (empty($class)) {
       return parent::create($values);
@@ -166,8 +190,8 @@ class XtendedEntityController extends \EntityAPIController {
   }
 
   public function getBundleClass($bundle) {
-    if (!isset($this->entityInfo['bundles'][$bundle]))
-      throw new \Exception("bundle $bundle not declared for {$this->entityType} " . var_export(array_keys($this->entityInfo['bundles']), 1));
+//     if (!isset($this->entityInfo['bundles'][$bundle]))
+//       throw new \Exception("bundle $bundle not declared for {$this->entityType} " . var_export(array_keys($this->entityInfo['bundles']), 1));
       if( isset( self::$__bundleMap[$this->entityType][$bundle] ) ) {
         return self::$__bundleMap[$this->entityType][$bundle];
       }

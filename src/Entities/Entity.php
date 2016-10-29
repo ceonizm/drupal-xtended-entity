@@ -63,7 +63,9 @@ class Entity extends \Entity {
       return $val;
     }
     
-    return NULL;
+    $null = NULL;
+    $nullRef =& $null;
+    return $nullRef;
   }
   
   public function __isset( $name ) {
