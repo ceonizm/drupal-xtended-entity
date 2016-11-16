@@ -4,6 +4,8 @@ namespace Drupal\xtended_entity\Entities;
 
 class TaxonomyTerm extends Entity {
   
+  const EntityType = "taxonomy_term";
+  
   public $tid;
   
   public $vocabulary_machine_name;

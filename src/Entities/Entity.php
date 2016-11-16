@@ -61,6 +61,9 @@ class Entity extends \Entity {
     if( array_key_exists( $name, $this->__values) ) {
       $val = &$this->__values[$name];
       return $val;
+    } else {
+      $this->__values[$name] = NULL;
+      return $this->__values[$name];
     }
     
     $null = NULL;

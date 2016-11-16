@@ -8,5 +8,18 @@ function xtended_entity_test_enable() {
   );
   variable_set('node_options_test_type' , $opts);
   variable_set('language_content_type_test_type' , 4);
+}
+
+function xtended_entity_test_install() {
+  $voc = (object) array( 'name' => 'test vocabulary', 'machine_name' => 'test_vocabulary' );
+  taxonomy_vocabulary_save($voc);
   
+  $term = (object) array( 'name' => 'DECATHLON', 'vocabulary_machine_name' => 'test_vocabulary', 'vid' => $voc->vid);
+  taxonomy_term_save( $term );
+}
+
+function xtended_entity_test_uninstall() {
+  
+  $voc = taxonomy_vocabulary_machine_name_load('test_vocabulary');
+  taxonomy_vocabulary_delete( $voc->vid );
 }

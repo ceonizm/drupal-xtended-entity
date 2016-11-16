@@ -10,7 +10,7 @@ namespace Drupal\xtended_entity\Controllers;
  */
 class XtendedNodeController extends XtendedEntityController {
 		
-	public function __construct( $pBundle = NULL) {
+	public function __construct( $entity_type = "node", $pBundle = NULL) {
 		parent::__construct("node", $pBundle );
 		//$this->hookLoadArguments = array( array( $pBundle ) );
 	}

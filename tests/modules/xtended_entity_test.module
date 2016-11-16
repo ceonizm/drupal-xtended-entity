@@ -12,12 +12,12 @@ function xtended_entity_test_node_info() {
     'description' => t('destination content type'), 
     'locked' => TRUE
   );
-  return $types;  
+  return $types;
 }
 
 function xtended_entity_test_entity_info_alter( &$infos ) {
   $infos['node']['bundles']['test_type']['bundle class'] = TestType::class;  
-  $infos['taxonomy_term']['bundles']['buildings']['bundle class'] = TestBuildingTerm::class;
+  $infos['taxonomy_term']['bundles']['test_vocabulary']['bundle class'] = TestBuildingTerm::class;
 }
 
 function xtended_entity_test_insert( $node ) {

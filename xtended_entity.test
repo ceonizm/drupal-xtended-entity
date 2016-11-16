@@ -28,13 +28,15 @@ class XtendedEntityTest extends DrupalWebTestCase {
   
   public function tearDown() {
     module_disable( array( 'xtended_entity_test' ) );
+    drupal_uninstall_modules( array( 'xtended_entity_test' ) );
   }
   
   public function testCreatingNode() {
     /* @var $ctrl XtendedNodeController */
     $ctrl = entity_get_controller("node");
 
-    $this->assertEqual( get_class( $ctrl ), XtendedNodeController::class, 'node controller should be replaced by our xtended ', 'xtended entity node' );
+    $ctrlClass = xtended_entity_request_controller_class('node', XtendedNodeController::class);
+    $this->assertEqual( get_class( $ctrl ), $ctrlClass, 'node controller should be replaced by our xtended ', 'xtended entity node' );
     
     $created = $ctrl->create( array( 'type' => 'test_type', 'uid'=>0, 'title' => 'plop' ) );
     $this->assertNotNull($created, 'created node should not be null');
@@ -61,8 +63,10 @@ class XtendedEntityTest extends DrupalWebTestCase {
     
     /* @var $ctrl XtendedTaxonomyTermController */
     $ctrl = entity_get_controller( "taxonomy_term" );
-    $this->assertEqual( get_class( $ctrl ), XtendedTaxonomyTermController::class, 'taxonomy_term controller should be replaced by our xtended ', 'xtended entity taxonomy_term' );
-    $ctrl->setBundle( 'buildings' );
+
+    $ctrlClass = xtended_entity_request_controller_class('taxonomy_term', XtendedTaxonomyTermController::class);
+    $this->assertEqual( get_class( $ctrl ), $ctrlClass, 'taxonomy_term controller should be replaced by our xtended ', 'xtended entity taxonomy_term' );
+
     $term = $ctrl->retrieveEntityByProperty( 'name', 'DECATHLON' ); 
     $this->assertEqual( get_class( $term ), TestBuildingTerm::class, 'term should be an instance of TermBuildingTerm', 'xtended entity taxonomy_term' );
     
