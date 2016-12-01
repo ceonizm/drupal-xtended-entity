@@ -35,6 +35,13 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
     $efq = new \EntityFieldQuery();
     $efq->entityCondition( 'entity_type', $this->entityType );
     if( !empty( $this->bundle ) ) $efq->entityCondition( 'bundle', $this->bundle );
+    if( array_key_exists('fieldConditions', $conditions) ) {
+      foreach( $conditions['fieldConditions'] as $fieldName=>$spec ) {
+        list( $column, $value, $operator, $delta, $language) = $spec + array(NULL,NULL,NULL,NULL,NULL);
+        $efq->fieldCondition($fieldName, $column, $value, $operator, $delta, $language);
+      }
+      unset( $conditions['fieldConditions'] );
+    }
     foreach( $conditions as $name => $value) {
       if( $name == $this->bundleKey )$efq->entityCondition( 'bundle', $value );
     }
@@ -138,6 +145,13 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
   public function getBundle() {
     return $this->bundle;
   }
+  
+  /**
+   * getter for bundleKey
+   */
+  public function getBundleKey() {
+    return $this->bundleKey;
+  }
 
   /**
    * setter for bundle
@@ -163,7 +177,7 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
 
   public function create(array $values = array()) {
     $values += array(
-      'is_new' => TRUE
+      'is_new' => TRUE,
     );
     //     watchdog("xtended_entity", "$this->bundleKey  is ".$this->bundleKey );
     $bundleKey = isset($this->bundle) ? $this->bundle : "";
@@ -172,9 +186,7 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
     }
 
     if (!empty($bundleKey)) {
-      //       watchdog("xtended_entity", "bundleKey to lookup is ".$bundleKey );
       $class = $this->getBundleClass($bundleKey);
-      //       watchdog("xtended_entity", "class found is ".$class );
     }
     if (empty($class)) {
       return parent::create($values);

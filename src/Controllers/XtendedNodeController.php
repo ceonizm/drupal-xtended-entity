@@ -50,4 +50,24 @@ class XtendedNodeController extends XtendedEntityController {
 	  return $query;
 	}
 
+	public function create( array $values = array() ) {
+	  global $user;
+	  if( !array_key_exists('uid', $values) ) {
+	    $values['uid'] = $user->uid;
+	  }
+	  $node = parent::create( $values );
+	  node_object_prepare($node);
+	  return $node;
+	}
+	
+	public function save( $node ) {
+	  $ret = SAVED_UPDATED;
+    if( !isset( $node->nid ) && ( isset( $node->is_new ) && $node->is_new ) ) {
+       $ret = SAVED_NEW;
+    }
+
+    node_save( $node );
+
+    return $ret;
+	}
 }

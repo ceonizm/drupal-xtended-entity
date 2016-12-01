@@ -26,19 +26,29 @@ class TaxonomyTerm extends Entity {
     
   public $changed;
   
+  public $parent;
+  /**
+   * 
+   * @var TaxonomyTerm[]
+   */
+  protected $_childs = array();
+  
   public function __construct( array $values = array(), $entityType = "taxonomy_term" ) {
     parent::__construct( $values, $entityType );
   }
   
-//   public function __get( $name ) {
-//     debug( "__get ( $name )");
-//     return parent::__get( $name );
-//   }
-  
-//   public function __set( $name, $value ) {
-//     debug( "__set( $name, ".var_export( $value, 1)." )" );
-//     parent::__set($name, $value);
-    
-//     return $this;
-//   }
+  /**
+   * 
+   * @param TaxonomyTerm $term
+   */
+  public function addChild( $term ) {
+    if( !in_array( $term, $this->_childs) ) {
+      $this->_childs[] = $term;
+      if( !isset( $term->parent ) ) $term->parent = array();
+      if( !in_array( $this->tid, $term->parent) ) {
+        $term->parent[] = $this->tid;
+      }
+    }
+  }
+
 }

@@ -28,6 +28,10 @@ class Node extends \Entity {
   
   public $sticky;
   
+  public $log = "";
+  
+  public $revision = TRUE;
+  
 //   public $translate;
   
 //   public $content;
