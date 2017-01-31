@@ -29,6 +29,15 @@ class XtendedTaxonomyTermController extends XtendedEntityController {
     return $term;
   }
 
+  /**
+   * 
+   * {@inheritDoc}
+   * @see EntityAPIControllerExportable::save()
+   */
+  public function save( $entity, \DatabaseTransaction $transaction = NULL ) {
+    return taxonomy_term_save( $entity );
+  }
+  
   public function retrieveTermByName($name) {
     return $this->retrieveEntityByProperty('name', $name);
   }

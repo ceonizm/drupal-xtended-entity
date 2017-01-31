@@ -6,7 +6,7 @@ class Node extends \Entity {
   
   public $nid;
   
-  public $vid;
+//   public $vid;
   
   public $type;
   
@@ -28,7 +28,7 @@ class Node extends \Entity {
   
   public $sticky;
   
-  public $log = "";
+//   public $log = "";
   
   public $revision = TRUE;
   

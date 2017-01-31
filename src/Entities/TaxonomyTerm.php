@@ -27,6 +27,8 @@ class TaxonomyTerm extends Entity {
   public $changed;
   
   public $parent;
+  
+  
   /**
    * 
    * @var TaxonomyTerm[]
@@ -35,6 +37,7 @@ class TaxonomyTerm extends Entity {
   
   public function __construct( array $values = array(), $entityType = "taxonomy_term" ) {
     parent::__construct( $values, $entityType );
+//     $this->parent = array();
   }
   
   /**
@@ -45,9 +48,9 @@ class TaxonomyTerm extends Entity {
     if( !in_array( $term, $this->_childs) ) {
       $this->_childs[] = $term;
       if( !isset( $term->parent ) ) $term->parent = array();
-      if( !in_array( $this->tid, $term->parent) ) {
-        $term->parent[] = $this->tid;
-      }
+//       if( !in_array( $this->tid, $term->parent) ) {
+        $term->parent = $this->tid;
+//       }
     }
   }
 

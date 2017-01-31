@@ -3,15 +3,15 @@
 namespace Drupal\xtended_entity\Controllers;
 
 class XtendedEntityController extends \EntityAPIControllerExportable {
-
+  
   protected $bundle;
-
+  
   protected static $__bundleMap = array();
 
   /**
    *
-   * @param string $entityType
-   * @param string $bundle
+   * @param string $entityType        
+   * @param string $bundle        
    */
   public function __construct($entityType, $bundle = NULL) {
     parent::__construct($entityType);
@@ -31,19 +31,44 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
    *
    * @return \EntityFieldQuery
    */
-  public function buildEntityFieldQuery( $conditions=array() ) {
+  public function buildEntityFieldQuery($conditions = array()) {
     $efq = new \EntityFieldQuery();
-    $efq->entityCondition( 'entity_type', $this->entityType );
-    if( !empty( $this->bundle ) ) $efq->entityCondition( 'bundle', $this->bundle );
-    if( array_key_exists('fieldConditions', $conditions) ) {
-      foreach( $conditions['fieldConditions'] as $fieldName=>$spec ) {
-        list( $column, $value, $operator, $delta, $language) = $spec + array(NULL,NULL,NULL,NULL,NULL);
+    $efq->entityCondition('entity_type', $this->entityType);
+    if (!empty($this->bundle))
+      $efq->entityCondition('bundle', $this->bundle);
+    if (array_key_exists('fieldConditions', $conditions)) {
+      foreach ($conditions['fieldConditions'] as $fieldName => $spec) {
+        list($column, $value, $operator, $delta, $language) = $spec + array(
+          NULL, 
+          NULL, 
+          NULL, 
+          NULL, 
+          NULL
+        );
         $efq->fieldCondition($fieldName, $column, $value, $operator, $delta, $language);
       }
-      unset( $conditions['fieldConditions'] );
+      unset($conditions['fieldConditions']);
     }
-    foreach( $conditions as $name => $value) {
-      if( $name == $this->bundleKey )$efq->entityCondition( 'bundle', $value );
+    
+    foreach ($conditions as $name => $value) {
+      if ($name == $this->bundleKey)
+        $efq->entityCondition('bundle', $value);
+      else {
+        if (is_array($value)) {
+          list($column, $val, $operator) = $value + array(
+            NULL, 
+            NULL, 
+            NULL
+          );
+          if ($column == $this->bundleKey) {
+            $efq->entityCondition('bundle', $val);
+          }
+          else {
+            $efq->propertyCondition($column, $val, $operator);
+          }
+        
+        }
+      }
     }
     return $efq;
   }
@@ -55,14 +80,14 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
   public function count(array $conditions = array()) {
     /* @var $q \EntityFieldQuery */
     $q = $this->buildEntityFieldQuery($conditions)->count();
-
+    
     return $q->execute();
   }
 
   /**
    *
-   * @param unknown $start
-   * @param unknown $amount
+   * @param unknown $start        
+   * @param unknown $amount        
    * @return mixed[]|Array|The
    */
   public function loadRange($start, $amount, array $conditions = array()) {
@@ -74,8 +99,8 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
 
   /**
    *
-   * @param string $pPropertyName
-   * @param string|array $pValue
+   * @param string $pPropertyName        
+   * @param string|array $pValue        
    * @param string $pColumn
    *        return array|NULL
    */
@@ -92,9 +117,9 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
 
   /**
    *
-   * @param string $pPropertyName
-   * @param mixed $pValue
-   * @param string $pOperator
+   * @param string $pPropertyName        
+   * @param mixed $pValue        
+   * @param string $pOperator        
    * @return stdClass|NULL
    */
   public function retrieveEntityByProperty($pPropertyName, $pValue, $pOperator = '=') {
@@ -106,9 +131,9 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
 
   /**
    *
-   * @param string $pFieldName
-   * @param string|array $pValue
-   * @param string $pColumn
+   * @param string $pFieldName        
+   * @param string|array $pValue        
+   * @param string $pColumn        
    */
   public function retrieveByField($pFieldName, $pColumn = 'value', $pValue = NULL, $operator = '=', $delta_group = NULL, $language_group = NULL) {
     if (is_array($pValue)) {
@@ -116,19 +141,19 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
     }
     $res = $this->buildEntityFieldQuery()->fieldCondition($pFieldName, $pColumn, $pValue, $operator, $delta_group, $language_group)->execute();
     if ($res && isset($res[$this->entityType])) {
-      return $this->load( array_keys($res[$this->entityType]));
+      return $this->load(array_keys($res[$this->entityType]));
     }
     return NULL;
   }
 
   /**
    *
-   * @param string $pFieldName
-   * @param string $pColumn
-   * @param mixed $pValue
-   * @param string $operator
-   * @param interger $delta_group
-   * @param string $language_group
+   * @param string $pFieldName        
+   * @param string $pColumn        
+   * @param mixed $pValue        
+   * @param string $operator        
+   * @param interger $delta_group        
+   * @param string $language_group        
    * @return mixed|NULL
    */
   public function retrieveEntityByField($pFieldName, $pColumn = 'value', $pValue = NULL, $operator = '=', $delta_group = NULL, $language_group = NULL) {
@@ -145,7 +170,7 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
   public function getBundle() {
     return $this->bundle;
   }
-  
+
   /**
    * getter for bundleKey
    */
@@ -156,7 +181,7 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
   /**
    * setter for bundle
    *
-   * @param string $bundle
+   * @param string $bundle        
    * @return \Drupal\zjm_player\Controller\XtendedEntityController
    */
   public function setBundle($bundle) {
@@ -165,10 +190,10 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
   }
 
   protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
-
+    
     parent::attachLoad($queried_entities, $revision_id);
-
-    foreach ( $queried_entities as $entity ) {
+    
+    foreach ($queried_entities as $entity) {
       if (method_exists($entity, 'attachLoad')) {
         $entity->attachLoad();
       }
@@ -177,14 +202,14 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
 
   public function create(array $values = array()) {
     $values += array(
-      'is_new' => TRUE,
+      'is_new' => TRUE
     );
-    //     watchdog("xtended_entity", "$this->bundleKey  is ".$this->bundleKey );
+    // watchdog("xtended_entity", "$this->bundleKey is ".$this->bundleKey );
     $bundleKey = isset($this->bundle) ? $this->bundle : "";
     if (array_key_exists($this->bundleKey, $values)) {
       $bundleKey = $values[$this->bundleKey];
     }
-
+    
     if (!empty($bundleKey)) {
       $class = $this->getBundleClass($bundleKey);
     }
@@ -197,18 +222,20 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
   public static function registerBundleClass($entityType, $bundle, $class) {
     if (!class_exists($class, TRUE))
       throw new \Exception("class $class doesn't exists");
-      if (!array_key_exists($entityType, self::$__bundleMap))
-        self::$__bundleMap[$entityType] = array();
-        if( !array_key_exists( $bundle, self::$__bundleMap[$entityType]) ) {
-          watchdog("xtended_entity", "registering for {$entityType}:$bundle -> $class ");
-          self::$__bundleMap[$entityType][$bundle] = $class;
-        }
+    if (!array_key_exists($entityType, self::$__bundleMap))
+      self::$__bundleMap[$entityType] = array();
+    if (!array_key_exists($bundle, self::$__bundleMap[$entityType])) {
+      // watchdog("xtended_entity", "registering for {$entityType}:$bundle ->
+      // $class ");
+      self::$__bundleMap[$entityType][$bundle] = $class;
+    }
   }
 
   public function getBundleClass($bundle) {
-    //     if (!isset($this->entityInfo['bundles'][$bundle]))
-      //       throw new \Exception("bundle $bundle not declared for {$this->entityType} " . var_export(array_keys($this->entityInfo['bundles']), 1));
-    if( isset( self::$__bundleMap[$this->entityType][$bundle] ) ) {
+    // if (!isset($this->entityInfo['bundles'][$bundle]))
+    // throw new \Exception("bundle $bundle not declared for {$this->entityType}
+    // " . var_export(array_keys($this->entityInfo['bundles']), 1));
+    if (isset(self::$__bundleMap[$this->entityType][$bundle])) {
       return self::$__bundleMap[$this->entityType][$bundle];
     }
     return NULL;
@@ -230,10 +257,10 @@ class XtendedEntityController extends \EntityAPIControllerExportable {
     $results = array();
     while ($row = $result->fetchAssoc()) {
       $row['is_new'] = FALSE;
-
+      
       $results[] = $this->create((array) $row);
     }
-
+    
     return $results;
   }
 
